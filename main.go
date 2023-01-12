@@ -33,8 +33,8 @@ func main() {
 
     fmt.Println("Starting server on port " + c.Port)
 
-    reverseProxy := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-        fmt.Printf("[reverse proxy server] received request at: %s\n", time.Now())
+    waf := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+        fmt.Printf("[SQLWall] received request at: %s\n", time.Now())
 
         // set req Host, URL and Request URI to forward a request to the origin server
         req.Host = destServerURL.Host
@@ -95,6 +95,6 @@ func main() {
         io.Copy(rw, originServerResponse.Body)
     })
 
-    log.Fatal(http.ListenAndServe(":"+c.Port, reverseProxy))
+    log.Fatal(http.ListenAndServe(":"+c.Port, waf))
 }
 
