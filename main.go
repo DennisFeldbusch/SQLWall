@@ -42,23 +42,6 @@ func main() {
         req.URL.Scheme = destServerURL.Scheme
         req.RequestURI = ""
 
-        /* PATH STRING PARSING */
-
-        // get the path from the request url
-        path := req.URL.Path
-        fmt.Println("[PATH] ", path)
-
-        // PATH Regex
-        pathRegex := `^(/\w|\d)*(/(\w|\d)*\.(\w|\d)*)`
-
-        pathMatch, _ := regexp.MatchString(pathRegex, path)
-
-        if (path != "" && pathMatch == false) {
-            rw.WriteHeader(http.StatusBadRequest)
-            rw.Write([]byte("Bad Request"))
-            return
-        }
-
         /* QUERY STRING PARSING */
 
         // get the query string from the request URL
@@ -66,7 +49,7 @@ func main() {
         fmt.Println("[QUERY] ", query)
 
         // QUERY Regex
-        queryRegex := `^(\w|\d)+=(\w|\d)+(&(\w|\d)+=(\w|\d)+)*$` 
+        queryRegex := `^(\w|\-|(?:%[0-9A-Fa-f]{2}))+=(\w|\-|(?:%[0-9A-Fa-f]{2}))+(&(\w|\-|(?:%[0-9A-Fa-f]{2}))+=(\w|\-|(?:%[0-9A-Fa-f]{2}))+)*$`
 
         queryMatch, _ := regexp.MatchString(queryRegex, query)
 
@@ -75,12 +58,6 @@ func main() {
             rw.Write([]byte("Bad Request"))
             return
         }
-
-        // print out the http Request
-        // EXPECTED: GET / HTTP2
-
-        //requestDump, err := httputil.DumpRequest(req, true)
-        //fmt.Println("[WHOLE] "+ string(requestDump))
 
         // save the response from the origin server
         originServerResponse, err := http.DefaultClient.Do(req)
