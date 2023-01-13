@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"net/url"
-	"regexp"
-	"time"
-	"github.com/milad-abbasi/gonfig"
+    "fmt"
+    "io"
+    "log"
+    "net/http"
+    "net/url"
+    "regexp"
+    "time"
+    "github.com/milad-abbasi/gonfig"
 )
 
 type Config struct {
@@ -21,9 +21,9 @@ func main() {
     var c Config
 
     err := gonfig.Load().FromFile("config.json").Into(&c)
-	if err != nil {
-		fmt.Println(err)
-	}
+    if err != nil {
+        fmt.Println(err)
+    }
 
     // define destination server URL
     destServerURL, err := url.Parse(c.Destination)
@@ -49,7 +49,32 @@ func main() {
         fmt.Println("[QUERY] ", query)
 
         // QUERY Regex
-        queryRegex := `^(\w|\-|(?:%[0-9A-Fa-f]{2}))+=(\w|\-|(?:%[0-9A-Fa-f]{2}))+(&(\w|\-|(?:%[0-9A-Fa-f]{2}))+=(\w|\-|(?:%[0-9A-Fa-f]{2}))+)*$`
+        queryRegex := `^(\w|\-|(%[0-9A-Fa-f]{2}))+=(\w|\-|(%[0-9A-Fa-f]{2}))+(&(\w|\-|(%[0-9A-Fa-f]{2}))+=(\w|\-|(%[0-9A-Fa-f]{2}))+)*$`
+
+        /*
+
+        REGEX EXPLANATION
+
+        ^ asserts position at start of a line
+
+        \w matches any digit or letter A-z or a underscore sign _
+        \- matches the - sign
+        (%[0-9A-Fa-f]{2}) matches any url encoded char like %20, %22, $a4, ... does NOT match %2x, %4-4, %xx, ...
+
+        (pattern)+ matches one or more occurences of the pattern 
+        (pattern)* matches zero or more occurences of the pattern 
+
+        simplified the used regex can be expressed like the following
+
+        ^(pattern)+=(pattern)+(&(pattern)+=(pattern)+)*$ 
+
+        where pattern is one of the matches described above
+
+        this is the definition of the query part in a url = key=value&key2=value2&key3=value3
+
+        $ asserts position at the end of a line
+
+        */ 
 
         queryMatch, _ := regexp.MatchString(queryRegex, query)
 
