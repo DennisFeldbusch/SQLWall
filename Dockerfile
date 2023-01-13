@@ -11,6 +11,4 @@ RUN go build -o /usr/local/bin/app
 
 # Incoming
 EXPOSE 8080 
-# Outgoing
-EXPOSE 80
 CMD ["/usr/local/bin/app"]
