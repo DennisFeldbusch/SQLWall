@@ -12,8 +12,8 @@ import (
 )
 
 type Config struct {
-    Port string `default:"8080"`
-    Destination string `default:"http://127.0.0.1:8081"`
+    listeningPort string `default:"8080"`
+    destinationURL string `default:"http://127.0.0.1:8081"`
 }
 
 func main() {
@@ -26,12 +26,12 @@ func main() {
     }
 
     // define destination server URL
-    destServerURL, err := url.Parse(c.Destination)
+    destServerURL, err := url.Parse(c.destinationURL)
     if err != nil {
         log.Fatal("invalid origin server URL")
     }
 
-    fmt.Println("Starting server on port " + c.Port)
+    fmt.Println("Starting server on port " + c.listeningPort)
 
     waf := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
         fmt.Printf("[SQLWall] received request at: %s\n", time.Now())
@@ -97,6 +97,6 @@ func main() {
         io.Copy(rw, originServerResponse.Body)
     })
 
-    log.Fatal(http.ListenAndServe(":"+c.Port, waf))
+    log.Fatal(http.ListenAndServe(":"+c.listeningPort, waf))
 }
 
