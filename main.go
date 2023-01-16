@@ -49,7 +49,7 @@ func main() {
         fmt.Println("[QUERY] ", query)
 
         // QUERY Regex
-        queryRegex := `^(\w|\-|(%[0-9A-Fa-f]{2}))+=(\w|\-|(%[0-9A-Fa-f]{2}))+(&(\w|\-|(%[0-9A-Fa-f]{2}))+=(\w|\-|(%[0-9A-Fa-f]{2}))+)*$`
+        queryRegex := `^(\w|\-)+=(\w|\-)+(&(\w|\-)+=(\w|\-)+)*$`
 
         /*
 
@@ -59,7 +59,6 @@ func main() {
 
         \w matches any digit or letter A-z or a underscore sign _
         \- matches the - sign
-        (%[0-9A-Fa-f]{2}) matches any url encoded char like %20, %22, $a4, ... does NOT match %2x, %4-4, %xx, ...
 
         (pattern)+ matches one or more occurences of the pattern 
         (pattern)* matches zero or more occurences of the pattern 
