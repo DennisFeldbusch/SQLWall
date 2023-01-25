@@ -7,13 +7,12 @@ import (
     "net/http"
     "net/url"
     "regexp"
-    "time"
     "github.com/milad-abbasi/gonfig"
 )
 
 type Config struct {
-    listeningPort string `default:"8080"`
-    destinationURL string `default:"http://127.0.0.1:8081"`
+    listeningPort string `default:"8084"`
+    destinationURL string `default:"http://127.0.0.1:8080"`
 }
 
 func main() {
@@ -26,7 +25,7 @@ func main() {
     }
 
     // define destination server URL
-    destServerURL, err := url.Parse(c.destinationURL)
+    destServerURL, err := url.Parse("http://127.0.0.1:8080")
     if err != nil {
         log.Fatal("invalid origin server URL")
     }
@@ -34,7 +33,7 @@ func main() {
     fmt.Println("Starting server on port " + c.listeningPort)
 
     waf := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-        fmt.Printf("[SQLWall] received request at: %s\n", time.Now())
+        //fmt.Printf("[SQLWall] received request at: %s\n", time.Now())
 
         // set req Host, URL and Request URI to forward a request to the origin server
         req.Host = destServerURL.Host
@@ -46,38 +45,26 @@ func main() {
 
         // get the query string from the request URL
         query := req.URL.RawQuery
-        fmt.Println("[QUERY] ", query)
 
         // QUERY Regex
-        queryRegex := `^(\w|\-)+=(\w|\-)+(&(\w|\-)+=(\w|\-)+)*$`
+
+        sqliRegex := `(?i)(\%3D)|(\%27)|(x27)|(\')|(\-\-)|(\%3B)|(;)|(exec)|(char)|(ascii)`
+        orRegex := `(?i)((\%6F)|o|(\%4F))((\%72)|r|(\%52))`
+        selectRegex := `(?i)((\%73)|s|(\%53))((\%65)|e|(\%45))((\%6c)|l|(\%4c))((\%65)|e|(\%45))((\%63)|c|(\%43))((\%74)|t|(\%54))`
 
         /*
 
         REGEX EXPLANATION
 
-        ^ asserts position at start of a line
-
-        \w matches any digit or letter A-z or a underscore sign _
-        \- matches the - sign
-
-        (pattern)+ matches one or more occurences of the pattern 
-        (pattern)* matches zero or more occurences of the pattern 
-
-        simplified the used regex can be expressed like the following
-
-        ^(pattern)+=(pattern)+(&(pattern)+=(pattern)+)*$ 
-
-        where pattern is one of the matches described above
-
-        this is the definition of the query part in a url = key=value&key2=value2&key3=value3
-
-        $ asserts position at the end of a line
 
         */ 
 
-        queryMatch, _ := regexp.MatchString(queryRegex, query)
+        queryMatch, _ := regexp.MatchString(sqliRegex, query)
+        orMatch, _ := regexp.MatchString(orRegex, query)
+        selectMatch, _ := regexp.MatchString(selectRegex, query)
 
-        if (query != "" && queryMatch == false) {
+
+        if (query != "" && ( queryMatch || orMatch || selectMatch)) {
             rw.WriteHeader(http.StatusBadRequest)
             rw.Write([]byte("Bad Request"))
             return
@@ -96,6 +83,6 @@ func main() {
         io.Copy(rw, originServerResponse.Body)
     })
 
-    log.Fatal(http.ListenAndServe(":"+c.listeningPort, waf))
+    log.Fatal(http.ListenAndServe(":8084", waf))
 }
 
