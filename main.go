@@ -49,12 +49,14 @@ func main() {
         // QUERY Regex
 
         sqliRegex   := `(?i)(\%3D)|(\%27)|(\')|(\-\-)|(\%3B)|(;)|(\%23)|(\#)|(\%2A)|(\*)`
-        escapeCharRegex := `(?i)(exec.*\(.*\))|(char.*\(.*\))|(ASCII.*\(.*\))|(BIN.*\(.*\))|(HEX.*\(.*\))|(UNHEX.*\(.*\))|(BASE64.*\(.*\))|(DEC.*\(.*\))|(ROT13.*\(.*\))`
+        escapeCharRegex := `(?i)(EXEC.*\(.*\))|(CHAR.*\(.*\))|(ASCII.*\(.*\))|(BIN.*\(.*\))|(HEX.*\(.*\))|(UNHEX.*\(.*\))|(BASE64.*\(.*\))|(DEC.*\(.*\))|(ROT13.*\(.*\))`
+        unionRegex  := `(?i)(UNION.*SELECT)`//|(UNION.*ALL)|(UNION.*DISTINCT)`
 
         queryMatch,  _ := regexp.MatchString(sqliRegex, query)
         escapeMatch, _ := regexp.MatchString(escapeCharRegex, query)
+        unionMatch,  _ := regexp.MatchString(unionRegex, query)
 
-        if (query != "" && ( queryMatch || escapeMatch )) {
+        if (query != "" && ( queryMatch || escapeMatch || unionMatch )) {
             rw.WriteHeader(http.StatusBadRequest)
             rw.Write([]byte("Possible SQL Injection detected"))
             return
