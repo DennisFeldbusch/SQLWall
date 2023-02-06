@@ -48,9 +48,9 @@ func main() {
 
         // QUERY Regex
 
-        sqliRegex   := `(?i)(\%3D)|(\%27)|(\')|(\-\-)|(\%3B)|(;)|(\%23)|(\#)|(\%2A)|(\*)`
-        escapeCharRegex := `(?i)(EXEC.*\(.*\))|(CHAR.*\(.*\))|(ASCII.*\(.*\))|(BIN.*\(.*\))|(HEX.*\(.*\))|(UNHEX.*\(.*\))|(BASE64.*\(.*\))|(DEC.*\(.*\))|(ROT13.*\(.*\))`
-        unionRegex  := `(?i)(UNION.*SELECT)`//|(UNION.*ALL)|(UNION.*DISTINCT)`
+        sqliRegex   := `(?i)(\%3D)|(\%25)|(\%2B)|(\%27)|(\')|(\%2D\%2D)|(\-\-)|(\%3B)|(;)|(\%23)|(\#)|(\%2F\%2A.*\%2A\%2F)|(/\*.*\*/)|(\%7C\%7C)|(\|\|)`
+        escapeCharRegex := `(?i)(EXEC.*\(.*\))|(CHAR.*\(.*\))|(ASCII.*\(.*\))|(BIN.*\(.*\))|(HEX.*\(.*\))|(UNHEX.*\(.*\))|(BASE64.*\(.*\))|(DEC.*\(.*\))|(ROT13.*\(.*\))|CHR.*\(.*\)`
+        unionRegex  := `(?i)(UNION.*SELECT)`
 
         queryMatch,  _ := regexp.MatchString(sqliRegex, query)
         escapeMatch, _ := regexp.MatchString(escapeCharRegex, query)
