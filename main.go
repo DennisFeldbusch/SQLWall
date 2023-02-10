@@ -52,7 +52,7 @@ func main() {
         // QUERY Regex
 
         sqliRegex   := `'|--|;|#|(/\*.*\*/)|\|\||<|>|!=`
-        escapeCharRegex := `(?i)(EXEC|CHAR|ASCII|BIN|HEX|UNHEX|BASE64|DEC|ROT13|CHR|CONVERT|SLEEP).*\(.*\)`
+        escapeCharRegex := `(?i)(EXEC|CHAR|ASCII|BIN|HEX|UNHEX|BASE64|DEC|ROT13|CHR|CONVERT).*\(.*\)`
         unionRegex  := `(?i)(UNION.*SELECT)`
 
         queryMatch,  _ := regexp.MatchString(sqliRegex, query)
